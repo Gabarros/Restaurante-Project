@@ -103,7 +103,7 @@
 <div class="modal fade" id="modal-update">
   <div class="modal-dialog">
     <div class="modal-content" style="border-top: 3px solid #00c0ef;">
-      <form method="post"  action="/admin/menus">
+      <form method="post" action="/admin/menus">
         <input type="hidden" name="id">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -146,67 +146,72 @@
 <script src="/js/hcode-formsave.js"></script>
 <script>
 
-new HcodeFileReader("#modal-create [type=file]", "#modal-create img");
-new HcodeFileReader("#modal-update [type=file]", "#modal-update img");
+  new HcodeFileReader("#modal-create [type=file]", "#modal-create img");
+  new HcodeFileReader("#modal-update [type=file]", "#modal-update img");
 
 
   let formCreate = document.querySelector('#modal-create form');
 
-  formCreate.addEventListener('submit', e => {
+
+  formCreate.save().then(json => {
+
+    window.location.reload();
+
+  }).catch(err => {
+
+    console.log(err);
+  });
 
 
-    e.preventDefault();
-    let formCreateData = new FormData(formCreate);
+  let formUpdate = document.querySelector('#modal-update form');
 
-    fetch('admin/menus', {
-      method: 'POST',
-      body: formCreateData
 
-    }).then(response => response.json())
-      .then(json => {
+  formUpdate.save().then(json => {
 
-        console.log('JSON', json);
+    window.location.reload();
+
+  }).catch(err => {
+
+    console.log(err);
+  });
+
+  [...document.querySelectorAll('.btn-update')].forEach(btn => {
+
+    btn.addEventListener('click', e => {
+
+
+      let tr = e.path.find(el => {
+
+        return (el.tagName.toUpperCase() === 'TR');
       });
 
-    let formUpdate = document.querySelector('#modal-update form');
+      let data = JSON.parse(tr.dataset.row);
 
-    [...document.querySelectorAll('.btn-update')].forEach(btn => {
+      for (let name in data) {
 
-      btn.addEventListener('click', e => {
+        switch (name) {
 
+          case 'photo':
 
-        let tr = e.path.find(el => {
+            formUpdate.querySelector('img').src = '/' + data[name];
 
-          return (el.tagName.toUpperCase() === 'TR');
-        });
+            break;
 
-        let data = JSON.parse(tr.dataset.row);
+          default:
 
-        for (let name in data) {
+            let input = formUpdate.querySelector(`[name=${name}]`)
+            if (input) {
 
-          switch (name) {
+              input.value = data[name];
 
-            case 'photo':
-
-            formUpdate.querySelector('img').src = '/'+data[name];
-
-              break;
-
-            default:
-
-              let input = formUpdate.querySelector(`[name=${name}]`)
-              if (input) {
-
-                input.value = data[name];
-
-              }
-          }
-
+            }
         }
 
-        $('#modal-update').modal('show');
-      });
+      }
+
+      $('#modal-update').modal('show');
     });
+  });
 
   });
 

@@ -26,16 +26,48 @@ module.exports = {
 
             fields.photo = `images/${path.parse(files.photo.path).base}`;
 
-            conn.query(`
+            let query, queryPhoto  = '', params;
+
+            if(files.photo.name){
+
+                queryPhoto = ',photo = ?';
+                params.push(fields.photo);
+
+            }
+            if(parseInt(fields.id) > 0){
+
+                params.push(fields.photo);
+
+                query = 
+                `UPDATE tb_menus
+                SET title = ?,
+                    description = ?,
+                    price = ?,
+                    ${queryPhoto}
+                WHERE id = ?
+                `;
+                params = [
+                    fields.title,
+                    fields.description,
+                    fields.price,
+                    fields.photo,
+                    fields.id
+                ];
+            }else{
+
+                if(files.photo.name){
+
+                    reject("Envie a foto");
+
+                }
+
+                query =`
                 INSERT INTO tb_menus (title, description, price, photo)
                 VALUES(?, ?, ?, ?)
-            `,[
-                fields.title,
-                fields.description, 
-                fields.price,
-                `images/${files.photo.name}`
+            `;
 
-            ], (err, results)=>{
+            }
+            conn.query(query, params, (err, results)=>{
 
                 if(err) {
 
