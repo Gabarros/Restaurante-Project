@@ -30,6 +30,7 @@ app.use(function(req, res, next){
   
     form.parse(req, function(req, fields, files){
   
+      req.body = fields;
       req.fields = fields;
       req.files = files;
 
@@ -61,7 +62,6 @@ app.use(
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 

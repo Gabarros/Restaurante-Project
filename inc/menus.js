@@ -79,8 +79,31 @@ module.exports = {
                 }
 
 
-            })
-        })
+            });
+        });
 
-    }
+    },
+
+    delete(id){
+
+        return new Promise((resolve, reject)=>{
+
+            conn.query(`
+                DELETE FROM tb_menus
+            `,[
+                id
+            ], (err, results)=>{
+
+                if(err){
+
+                    reject(err);
+
+                }else{
+
+                    resolve(results);
+                }
+            });
+
+    })
+}
 }
