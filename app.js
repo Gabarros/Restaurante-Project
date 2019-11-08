@@ -1,20 +1,48 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const session = require('express-session');
 const redis = require('redis');
 const RedisStore = require('connect-redis')(session);
+const formidable = require('formidable');
+
+
 
 let redisClient = redis.createClient();
 
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var adminRouter = require('./routes/admin');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const adminRouter = require('./routes/admin');
 
-var app = express();
+const app = express();
+
+app.use(function(req, res, next){
+
+  if(req.method === 'POST'){
+
+    const form = formidable.IncomingForm({
+      uploadDir:path.join(__dirname, "/public/images"),
+      keepExtensions: true
+    });
+  
+    form.parse(req, function(req, fields, files){
+  
+      req.fields = fields;
+      req.files = files;
+
+      next();
+  
+    });
+
+  }else{
+    next();
+  }
+
+ 
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

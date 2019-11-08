@@ -1,7 +1,7 @@
 const express = require('express');
 const users = require('./../inc/users');
 const admin = require('./../inc/admin');
-
+const menus = require('./../inc/menus');
 const router = express.Router();
 
 router.use(function (req, res, next) {
@@ -93,7 +93,23 @@ router.get('/emails', function (req, res, next) {
 
 router.get('/menus', function (req, res, next) {
 
-    res.render('admin/menus',admin.getParams(req));
+    menus.getMenus().then(data=>{
+
+        res.render('admin/menus',admin.getParams(req, {
+            data
+        }));    
+    })
+});
+
+router.post('/menus', function(req, res, next){
+
+    menus.save(req.fields, req.files).then(results=>{
+
+        res.send(results);
+    }).catch(err=>{
+
+        res.send(err);
+    })
 
 });
 
